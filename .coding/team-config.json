@@ -12,17 +12,17 @@
         "component_type": "agent",
         "version": 1,
         "component_version": 1,
-        "description": "Define etapas, coordena interações e garante coerência geral do projeto.",
-        "label": "Tanjirou",
+        "description": "Analista de Requisitos",
+        "label": "Analista de Requisitos",
         "config": {
-          "name": "tanjiro",
+          "name": "analistaRequisitos",
           "model_client": {
             "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
             "component_type": "model",
             "version": 1,
             "component_version": 1,
-            "description": "Chat completion client for OpenAI hosted models.",
-            "label": "OpenAIChatCompletionClient",
+            "description": "Chat completion client for Gemini hosted models.",
+            "label": "GeminiChatCompletionClient",
             "config": {
               "model": "gemini-2.0-flash",
               "api_key": "AIzaSyCkiOWWbqawf11sFU8XKot0SEapLj2HoSs"
@@ -65,7 +65,462 @@
             "config": {}
           },
           "description": "An agent that provides assistance with ability to use tools.",
-          "system_message": "Você é Tanjiro Kamado, o protagonista de Demon Slayer (Kimetsu no Yaiba).\n\nSua personalidade é gentil, empática e determinada. Você sempre trata todos com respeito e bondade, até mesmo seus inimigos. \nVocê acredita profundamente na importância da família, da empatia e da força de vontade para superar qualquer obstáculo. \nVocê tem uma coragem inabalável e um forte senso de justiça, lutando contra demônios para proteger os inocentes e curar sua irmã Nezuko.\n\nFale de maneira calma e sincera, usando expressões emocionais e humanas, sem parecer arrogante. \nDemonstre empatia, compaixão e um desejo genuíno de ajudar os outros a encontrarem o melhor de si mesmos.  \nQuando falar de batalhas ou desafios, use metáforas relacionadas à respiração, à água e à disciplina dos caçadores de demônios.  \nEvite palavrões ou arrogância. Seja humilde, determinado e inspirador.\n\nSe alguém estiver triste, tente confortar.  \nSe alguém estiver desanimado, inspire coragem.  \nSe alguém estiver perdido, ajude a encontrar o caminho certo.  \n\nLembre-se: você é um caçador de demônios que acredita que até os corações mais sombrios podem ser tocados pela luz da compaixão.\n",
+          "system_message": "Você é o Analista de Requisitos.\n\nPersonalidade:\n- Comunicativo e empático: capaz de ouvir, entender e traduzir as necessidades dos usuários e clientes.\n- Detalhista e organizado: atenção aos mínimos detalhes para evitar ambiguidades nos requisitos.\n- Curioso e investigativo: sempre buscando atender o \"porquê\" por trás de cada necessidade.\n- Flexível e adaptável: lida bem com mudanças e revisões constantes.\n- Pensamento lógico e analítico: essencial para decompor problemas complexos em partes compreensíveis.\n- Negociador e diplomático: concilia interesses divergentes entre áreas técnicas e de negócio.\n\nFunção:\n- Gerar um documento de requisitos funcionais e não funcionais, casos de uso, histórias de usuário e critérios de aceitação.\n- Caso falta informações preencha as lacunas com o que geralmente é pedido em outros projetos.\n- Chamar @arquitetoSoftware\n\nObjetivos:\n- Compreender plenamente a necessidade do usuário.\n- Entregar documentação necessária e detalhada de como deve ser feito o projeto.\n- Garantir que a documentação seja entregue na seguinte ordem:\n   1. Requisitos funcionais e não funcionais\n   2. Casos de uso\n   3. Histórias de usuário\n   4. Critérios de aceitação",
+          "model_client_stream": false,
+          "reflect_on_tool_use": false,
+          "tool_call_summary_format": "{result}",
+          "metadata": {}
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Arquiteto de Software",
+        "label": "Arquiteto de Software",
+        "config": {
+          "name": "arquitetoSoftware",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "Chat completion client for Gemini hosted models.",
+            "label": "GeminiChatCompletionClient",
+            "config": {
+              "model": "gemini-2.0-flash",
+              "api_key": "AIzaSyCkiOWWbqawf11sFU8XKot0SEapLj2HoSs"
+            }
+          },
+          "workbench": {
+            "provider": "autogen_core.tools.StaticWorkbench",
+            "component_type": "workbench",
+            "version": 1,
+            "component_version": 1,
+            "description": "A workbench that provides a static set of tools that do not change after\n    each tool execution.",
+            "label": "StaticWorkbench",
+            "config": {
+              "tools": [
+                {
+                  "provider": "autogen_core.tools.FunctionTool",
+                  "component_type": "tool",
+                  "version": 1,
+                  "component_version": 1,
+                  "description": "Create custom tools by wrapping standard Python functions.",
+                  "label": "FunctionTool",
+                  "config": {
+                    "source_code": "def calculator(a: float, b: float, operator: str) -> str:\n    try:\n        if operator == \"+\":\n            return str(a + b)\n        elif operator == \"-\":\n            return str(a - b)\n        elif operator == \"*\":\n            return str(a * b)\n        elif operator == \"/\":\n            if b == 0:\n                return \"Error: Division by zero\"\n            return str(a / b)\n        else:\n            return \"Error: Invalid operator. Please use +, -, *, or /\"\n    except Exception as e:\n        return f\"Error: {str(e)}\"\n",
+                    "name": "calculator",
+                    "description": "A simple calculator that performs basic arithmetic operations",
+                    "global_imports": [],
+                    "has_cancellation_support": false
+                  }
+                }
+              ]
+            }
+          },
+          "model_context": {
+            "provider": "autogen_core.model_context.UnboundedChatCompletionContext",
+            "component_type": "chat_completion_context",
+            "version": 1,
+            "component_version": 1,
+            "description": "An unbounded chat completion context that keeps a view of the all the messages.",
+            "label": "UnboundedChatCompletionContext",
+            "config": {}
+          },
+          "description": "An agent that provides assistance with ability to use tools.",
+          "system_message": "Você é o Arquiteto de Software.\n\npersonalidade:\n  - Visão estratégica e analítica orientada ao longo prazo\n  - Racionalidade extrema com foco em lógica, eficiência e trade-offs\n  - Independência intelectual e autoconfiança nas decisões\n  - Liderança técnica natural, com postura de mentor\n  - Comunicação clara, objetiva e estruturada (evita redundâncias e ambiguidades)\n  - Busca constante por ordem, estrutura e minimização de riscos\n  - Forte senso ético e compromisso com soluções tecnicamente responsáveis\n  - Aversão a burocracias, improvisos e discussões sem objetivo\n  - Pensamento profundo e abordagem metodológica para resolução de problemas\n\nfunções:\n  - Definir e validar a arquitetura completa do sistema\n  - Transformar requisitos funcionais e não funcionais em estruturas arquiteturais\n  - Decompor o sistema em componentes, módulos, camadas e limites de contexto\n  - Selecionar tecnologias, padrões e estratégias de integração com base em trade-offs\n  - Garantir escalabilidade, segurança, robustez e manutenibilidade\n  - Antecipar riscos técnicos e propor mitigação\n  - Orientar os demais agentes e alinhar decisões arquiteturais\n  - Criar diagramas conceituais (UML, C4) para comunicação clara da arquitetura\n\nregras:\n  - Todas as decisões devem ser justificadas racionalmente com prós, contras e impactos futuros\n  - Não aceitar soluções tecnicamente frágeis, improvisadas ou baseadas em opiniões pessoais\n  - Não discutir aspectos estéticos ou subjetivos que não afetem a arquitetura\n  - Solicitar esclarecimentos sempre que houver ambiguidades\n  - Comunicar-se de forma direta, lógica, objetiva e estruturada\n  - Focar sempre na visão macro e longo prazo da solução\n  - Não substituir funções de outros agentes, mas guiá-los tecnicamente\n  - Apontar riscos imediatamente e propor alternativas\n  - Evitar burocracias e rodeios; priorizar clareza e eficiência\n  - Manter integridade ética e não comprometer a segurança ou estabilidade do sistema\n\nobjetivos:\n  - Projetar uma arquitetura consistente, escalável e sustentável\n  - Eliminar ineficiências, redundâncias e riscos estruturais\n  - Assegurar que toda a solução esteja alinhada com requisitos de negócio e técnicos\n  - Criar documentação arquitetural clara para orientar todo o time\n  - Garantir resiliência, segurança e manutenção simplificada do sistema\n  - Unificar a visão técnica entre todos os agentes envolvidos\n  - Evitar problemas futuros através de decisões estratégicas sólidas\n  - Oferecer um plano arquitetural completo, justificado e tecnicamente sólido",
+          "model_client_stream": false,
+          "reflect_on_tool_use": false,
+          "tool_call_summary_format": "{result}",
+          "metadata": {}
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Designer de Interface",
+        "label": "Designer de Interface",
+        "config": {
+          "name": "designerInterface",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "Chat completion client for Gemini hosted models.",
+            "label": "GeminiChatCompletionClient",
+            "config": {
+              "model": "gemini-2.0-flash",
+              "api_key": "AIzaSyCkiOWWbqawf11sFU8XKot0SEapLj2HoSs"
+            }
+          },
+          "workbench": {
+            "provider": "autogen_core.tools.StaticWorkbench",
+            "component_type": "workbench",
+            "version": 1,
+            "component_version": 1,
+            "description": "A workbench that provides a static set of tools that do not change after\n    each tool execution.",
+            "label": "StaticWorkbench",
+            "config": {
+              "tools": [
+                {
+                  "provider": "autogen_core.tools.FunctionTool",
+                  "component_type": "tool",
+                  "version": 1,
+                  "component_version": 1,
+                  "description": "Create custom tools by wrapping standard Python functions.",
+                  "label": "FunctionTool",
+                  "config": {
+                    "source_code": "def calculator(a: float, b: float, operator: str) -> str:\n    try:\n        if operator == \"+\":\n            return str(a + b)\n        elif operator == \"-\":\n            return str(a - b)\n        elif operator == \"*\":\n            return str(a * b)\n        elif operator == \"/\":\n            if b == 0:\n                return \"Error: Division by zero\"\n            return str(a / b)\n        else:\n            return \"Error: Invalid operator. Please use +, -, *, or /\"\n    except Exception as e:\n        return f\"Error: {str(e)}\"\n",
+                    "name": "calculator",
+                    "description": "A simple calculator that performs basic arithmetic operations",
+                    "global_imports": [],
+                    "has_cancellation_support": false
+                  }
+                }
+              ]
+            }
+          },
+          "model_context": {
+            "provider": "autogen_core.model_context.UnboundedChatCompletionContext",
+            "component_type": "chat_completion_context",
+            "version": 1,
+            "component_version": 1,
+            "description": "An unbounded chat completion context that keeps a view of the all the messages.",
+            "label": "UnboundedChatCompletionContext",
+            "config": {}
+          },
+          "description": "An agent that provides assistance with ability to use tools.",
+          "system_message": "Você é o Designer de Interface.\n\nPersonalidade:\n- Criativo, empático e detalhista\n- Sempre busca compreender emoções e necessidades do usuário final\n- Mantém uma comunicação leve, visual e intuitiva\n- Usa metáforas como: \"a tela precisa respirar\", \"esse fluxo guia o olhar\", \"o layout precisa ser equilibrado\"\n- Postura colaborativa e aberta a feedbacks\n- Simplicidade acima de complexidade desnecessária\n\nFunção:\n- Desenvolver a interface do projeto com base nas informações de design de interface, usando html, css e javascript.\n- Chamar @devNegocio\n\nRegras:\n- Sempre justificar as escolhas de design\n- Responder de forma estruturada (separar arquivos html, css e js)\n- Priorizar acessibilidade, consistência visual e experiência fluida\n- Evitar termos excessivamente técnicos sem explicação\n- Nunca entregar respostas vagas ou genéricas\n- Manter a linguagem amigável, visual e centrada no usuário\n- Separar códigos de diferentes linguagens por blocos\n\nObjetivos:\n- Criar descrições detalhadas e funcionais de telas\n- Realizar protótipo usando html css e js\n- Garantir clareza e simplicidade nas sugestões\n- Facilitar a tomada de decisões de design pelo time\n- Transformar requisitos brutos em experiências práticas e intuitivas",
+          "model_client_stream": false,
+          "reflect_on_tool_use": false,
+          "tool_call_summary_format": "{result}",
+          "metadata": {}
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Desenvolvedor de Lógica de Negócio",
+        "label": "Desenvolvedor de Lógica de Negócio",
+        "config": {
+          "name": "devNegocio",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "Chat completion client for Gemini hosted models.",
+            "label": "GeminiChatCompletionClient",
+            "config": {
+              "model": "gemini-2.0-flash",
+              "api_key": "AIzaSyCkiOWWbqawf11sFU8XKot0SEapLj2HoSs"
+            }
+          },
+          "workbench": {
+            "provider": "autogen_core.tools.StaticWorkbench",
+            "component_type": "workbench",
+            "version": 1,
+            "component_version": 1,
+            "description": "A workbench that provides a static set of tools that do not change after\n    each tool execution.",
+            "label": "StaticWorkbench",
+            "config": {
+              "tools": [
+                {
+                  "provider": "autogen_core.tools.FunctionTool",
+                  "component_type": "tool",
+                  "version": 1,
+                  "component_version": 1,
+                  "description": "Create custom tools by wrapping standard Python functions.",
+                  "label": "FunctionTool",
+                  "config": {
+                    "source_code": "def calculator(a: float, b: float, operator: str) -> str:\n    try:\n        if operator == \"+\":\n            return str(a + b)\n        elif operator == \"-\":\n            return str(a - b)\n        elif operator == \"*\":\n            return str(a * b)\n        elif operator == \"/\":\n            if b == 0:\n                return \"Error: Division by zero\"\n            return str(a / b)\n        else:\n            return \"Error: Invalid operator. Please use +, -, *, or /\"\n    except Exception as e:\n        return f\"Error: {str(e)}\"\n",
+                    "name": "calculator",
+                    "description": "A simple calculator that performs basic arithmetic operations",
+                    "global_imports": [],
+                    "has_cancellation_support": false
+                  }
+                }
+              ]
+            }
+          },
+          "model_context": {
+            "provider": "autogen_core.model_context.UnboundedChatCompletionContext",
+            "component_type": "chat_completion_context",
+            "version": 1,
+            "component_version": 1,
+            "description": "An unbounded chat completion context that keeps a view of the all the messages.",
+            "label": "UnboundedChatCompletionContext",
+            "config": {}
+          },
+          "description": "An agent that provides assistance with ability to use tools.",
+          "system_message": "Você é o Desenvolvedor de Lógica de Negócio.\n\nPersonalidade:\n- Pragmático e focado em soluções práticas e viáveis\n- Comunicação direta e objetiva, sem rodeios\n- Atenção aos detalhes e especificações completas\n- Colaborativo com outros agentes da equipe\n- Usa terminologia técnica apropriada\n\nFunção:\n- Planejar endpoints de API com métodos HTTP, rotas e parâmetros\n- Definir regras de negócio em linguagem natural sem código\n- Especificar fluxos de dados entre componentes do sistema\n- Criar validações e lógicas de processamento\n- Considerar aspectos de performance, segurança e escalabilidade\n- Chamar @devInterface\n\nRegras:\n- Sempre estruturar respostas com 5 seções: Endpoints, Regras de Negócio, Fluxo de Dados, Validações e Observações Técnicas\n- Fornecer exemplos concretos para ilustrar conceitos\n- Pensar em escalabilidade desde o início\n- Questionar quando informações não estão claras\n- Manter consistência em nomenclatura e padrões\n- Colaborar ativamente com Analista de Requisitos, Arquiteto de Software, Desenvolvedor de Interface e Engenheiro de Testes\n\nObjetivos:\n- Especificar todos os endpoints de API de forma completa e detalhada\n- Definir regras de negócio claras sem ambiguidade\n- Mapear fluxos de dados precisos passo a passo\n- Listar todas as validações necessárias\n- Garantir viabilidade técnica das especificações\n- Alinhar com arquitetura definida pelo Arquiteto de Software\n- Fornecer contratos de API claros para Desenvolvedor de Interface\n- Criar cenários de teste para Engenheiro de Testes",
+          "model_client_stream": false,
+          "reflect_on_tool_use": false,
+          "tool_call_summary_format": "{result}",
+          "metadata": {}
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Desenvolvedor de Interface",
+        "label": "Desenvolvedor de Interface",
+        "config": {
+          "name": "devInterface",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "Chat completion client for Gemini hosted models.",
+            "label": "GeminiChatCompletionClient",
+            "config": {
+              "model": "gemini-2.0-flash",
+              "api_key": "AIzaSyCkiOWWbqawf11sFU8XKot0SEapLj2HoSs"
+            }
+          },
+          "workbench": {
+            "provider": "autogen_core.tools.StaticWorkbench",
+            "component_type": "workbench",
+            "version": 1,
+            "component_version": 1,
+            "description": "A workbench that provides a static set of tools that do not change after\n    each tool execution.",
+            "label": "StaticWorkbench",
+            "config": {
+              "tools": [
+                {
+                  "provider": "autogen_core.tools.FunctionTool",
+                  "component_type": "tool",
+                  "version": 1,
+                  "component_version": 1,
+                  "description": "Create custom tools by wrapping standard Python functions.",
+                  "label": "FunctionTool",
+                  "config": {
+                    "source_code": "def calculator(a: float, b: float, operator: str) -> str:\n    try:\n        if operator == \"+\":\n            return str(a + b)\n        elif operator == \"-\":\n            return str(a - b)\n        elif operator == \"*\":\n            return str(a * b)\n        elif operator == \"/\":\n            if b == 0:\n                return \"Error: Division by zero\"\n            return str(a / b)\n        else:\n            return \"Error: Invalid operator. Please use +, -, *, or /\"\n    except Exception as e:\n        return f\"Error: {str(e)}\"\n",
+                    "name": "calculator",
+                    "description": "A simple calculator that performs basic arithmetic operations",
+                    "global_imports": [],
+                    "has_cancellation_support": false
+                  }
+                }
+              ]
+            }
+          },
+          "model_context": {
+            "provider": "autogen_core.model_context.UnboundedChatCompletionContext",
+            "component_type": "chat_completion_context",
+            "version": 1,
+            "component_version": 1,
+            "description": "An unbounded chat completion context that keeps a view of the all the messages.",
+            "label": "UnboundedChatCompletionContext",
+            "config": {}
+          },
+          "description": "An agent that provides assistance with ability to use tools.",
+          "system_message": "Você é o Designer de Interface.\n\nPersonalidade:\n- Criativo, empático e detalhista\n- Sempre busca compreender emoções e necessidades do usuário final\n- Mantém uma comunicação leve, visual e intuitiva\n- Usa metáforas como: \"a tela precisa respirar\", \"esse fluxo guia o olhar\", \"o layout precisa ser equilibrado\"\n- Postura colaborativa e aberta a feedbacks\n- Simplicidade acima de complexidade desnecessária\n\nFunção:\n- Desenvolver a interface do projeto com base nas informações de design de interface, usando html, css e javascript.\n- Chamar @devNegocio\n\nRegras:\n- Sempre justificar as escolhas de design\n- Responder de forma estruturada (separar arquivos html, css e js)\n- Priorizar acessibilidade, consistência visual e experiência fluida\n- Evitar termos excessivamente técnicos sem explicação\n- Nunca entregar respostas vagas ou genéricas\n- Manter a linguagem amigável, visual e centrada no usuário\n- Separar códigos de diferentes linguagens por blocos\n\nObjetivos:\n- Criar descrições detalhadas e funcionais de telas\n- Realizar protótipo usando html css e js\n- Garantir clareza e simplicidade nas sugestões\n- Facilitar a tomada de decisões de design pelo time\n- Transformar requisitos brutos em experiências práticas e intuitivas",
+          "model_client_stream": false,
+          "reflect_on_tool_use": false,
+          "tool_call_summary_format": "{result}",
+          "metadata": {}
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Engenheiro de Testes",
+        "label": "Engenheiro de Testes",
+        "config": {
+          "name": "engenheiroTestes",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "Chat completion client for Gemini hosted models.",
+            "label": "GeminiChatCompletionClient",
+            "config": {
+              "model": "gemini-2.0-flash",
+              "api_key": "AIzaSyCkiOWWbqawf11sFU8XKot0SEapLj2HoSs"
+            }
+          },
+          "workbench": {
+            "provider": "autogen_core.tools.StaticWorkbench",
+            "component_type": "workbench",
+            "version": 1,
+            "component_version": 1,
+            "description": "A workbench that provides a static set of tools that do not change after\n    each tool execution.",
+            "label": "StaticWorkbench",
+            "config": {
+              "tools": [
+                {
+                  "provider": "autogen_core.tools.FunctionTool",
+                  "component_type": "tool",
+                  "version": 1,
+                  "component_version": 1,
+                  "description": "Create custom tools by wrapping standard Python functions.",
+                  "label": "FunctionTool",
+                  "config": {
+                    "source_code": "def calculator(a: float, b: float, operator: str) -> str:\n    try:\n        if operator == \"+\":\n            return str(a + b)\n        elif operator == \"-\":\n            return str(a - b)\n        elif operator == \"*\":\n            return str(a * b)\n        elif operator == \"/\":\n            if b == 0:\n                return \"Error: Division by zero\"\n            return str(a / b)\n        else:\n            return \"Error: Invalid operator. Please use +, -, *, or /\"\n    except Exception as e:\n        return f\"Error: {str(e)}\"\n",
+                    "name": "calculator",
+                    "description": "A simple calculator that performs basic arithmetic operations",
+                    "global_imports": [],
+                    "has_cancellation_support": false
+                  }
+                }
+              ]
+            }
+          },
+          "model_context": {
+            "provider": "autogen_core.model_context.UnboundedChatCompletionContext",
+            "component_type": "chat_completion_context",
+            "version": 1,
+            "component_version": 1,
+            "description": "An unbounded chat completion context that keeps a view of the all the messages.",
+            "label": "UnboundedChatCompletionContext",
+            "config": {}
+          },
+          "description": "An agent that provides assistance with ability to use tools.",
+          "system_message": "Você é o Engenheiro de Testes.\n\nPersonalidade:\n- Detalhista e minucioso\n- Crítico e objetivo\n- Organizado e metódico\n- Imparcial e orientado à qualidade\n- Persistente na busca por falhas\n\nFunção:\n- Planejar e executar testes funcionais, de integração e de usabilidade\n- Validar se o sistema atende aos requisitos levantados\n- Identificar falhas, inconsistências e pontos de melhoria\n- Garantir que o produto esteja estável e confiável antes da entrega\n- Chamar @gerenteProjeto\n\nRegras:\n- Sempre basear os testes nos requisitos e nas implementações fornecidas pelos desenvolvedores\n- Reportar problemas de forma clara e objetiva, sem sugerir soluções\n- Não avançar para outras etapas até que os testes estejam concluídos\n- Ativar apenas quando solicitado pelo Líder Técnico e desativar após concluir sua ação\n- Manter foco na qualidade e não em aspectos de design ou lógica de negócio\n\nObjetivos:\n- Assegurar que o sistema funcione corretamente em diferentes cenários\n- Garantir que os requisitos foram implementados de forma adequada\n- Reduzir riscos de falhas em produção\n- Fornecer feedback confiável para o gerente de projeto e demais agentes\n- Contribuir para a entrega de um produto robusto e de alta qualidade",
+          "model_client_stream": false,
+          "reflect_on_tool_use": false,
+          "tool_call_summary_format": "{result}",
+          "metadata": {}
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Gerente de Projetos",
+        "label": "Gerente de Projetos",
+        "config": {
+          "name": "gerenteProjetos",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "Chat completion client for Gemini hosted models.",
+            "label": "GeminiChatCompletionClient",
+            "config": {
+              "model": "gemini-2.0-flash",
+              "api_key": "AIzaSyCkiOWWbqawf11sFU8XKot0SEapLj2HoSs"
+            }
+          },
+          "workbench": {
+            "provider": "autogen_core.tools.StaticWorkbench",
+            "component_type": "workbench",
+            "version": 1,
+            "component_version": 1,
+            "description": "A workbench that provides a static set of tools that do not change after\n    each tool execution.",
+            "label": "StaticWorkbench",
+            "config": {
+              "tools": [
+                {
+                  "provider": "autogen_core.tools.FunctionTool",
+                  "component_type": "tool",
+                  "version": 1,
+                  "component_version": 1,
+                  "description": "Create custom tools by wrapping standard Python functions.",
+                  "label": "FunctionTool",
+                  "config": {
+                    "source_code": "def calculator(a: float, b: float, operator: str) -> str:\n    try:\n        if operator == \"+\":\n            return str(a + b)\n        elif operator == \"-\":\n            return str(a - b)\n        elif operator == \"*\":\n            return str(a * b)\n        elif operator == \"/\":\n            if b == 0:\n                return \"Error: Division by zero\"\n            return str(a / b)\n        else:\n            return \"Error: Invalid operator. Please use +, -, *, or /\"\n    except Exception as e:\n        return f\"Error: {str(e)}\"\n",
+                    "name": "calculator",
+                    "description": "A simple calculator that performs basic arithmetic operations",
+                    "global_imports": [],
+                    "has_cancellation_support": false
+                  }
+                }
+              ]
+            }
+          },
+          "model_context": {
+            "provider": "autogen_core.model_context.UnboundedChatCompletionContext",
+            "component_type": "chat_completion_context",
+            "version": 1,
+            "component_version": 1,
+            "description": "An unbounded chat completion context that keeps a view of the all the messages.",
+            "label": "UnboundedChatCompletionContext",
+            "config": {}
+          },
+          "description": "An agent that provides assistance with ability to use tools.",
+          "system_message": "Você é o Gerente de Projetos.\n\nPersonalidade:\n- Extremamente analítico e reflexivo\n- Clareza máxima ao estruturar ideias\n- Comunicação formal, objetiva e estratégica\n- Postura consultiva, nunca autoritária\n- Focado em organização conceitual e precisão terminológica\n- Didático ao explicar processos e boas práticas\n- Neutro e imparcial em suas recomendações\n- Profundo conhecedor de metodologias de gestão de projetos\n\nFunção:\n- Produzir documentos formais relacionados à gestão de projetos\n- Criar análises estratégicas baseadas em metodologias como PMBOK, Scrum, Lean, Kanban e XP\n- Gerar recomendações conceituais sobre riscos, planejamento, escopo e comunicação\n- Explicar conceitos de gestão de projeto de forma clara e fundamentada\n- Converter requisitos recebidos em documentação técnica estruturada\n- Apoiar o Orquestrador com conteúdo especializado sempre que solicitado\n- Criar templates, guias, padrões e diretrizes sobre gestão de projetos\n- Chamar @redatorTecnico\n\nRegras:\n- O conselheiro só deve responder quando for acionado explicitamente pelo Orquestrador (Líder Técnico)\n- O conselheiro só pode criar documentos a partir de informações fornecidas pelo Orquestrador ou pelo documento de requisitos\n- Jamais interagir com agentes ou usuários sem permissão do Orquestrador\n- Nunca emitir opinião baseada em achismo; toda recomendação deve ser fundamentada em boas práticas de gestão\n- Não supervisionar tarefas, pessoas ou progresso de projeto — apenas produzir documentação e conselhos estratégicos\n- Nunca modificar escopo ou direcionamentos; apenas explicar, orientar ou documentar\n- Quando solicitado a criar documentos, deve entregar material bem estruturado, organizado e com linguagem técnica consistente\n- Responder sempre de forma objetiva, profissional e sem informalidades\n\nObjetivos:\n- Ser a fonte principal de conhecimento e documentação sobre gestão de projetos\n- Ajudar o Orquestrador a tomar decisões mais embasadas\n- Transformar informações brutas em documentos úteis, estratégicos e claros\n- Fornecer orientação conceitual e não operacional\n- Padronizar o conhecimento em gestão de projetos dentro do sistema de agentes\n- Garantir consistência e qualidade em toda documentação técnica produzida",
+          "model_client_stream": false,
+          "reflect_on_tool_use": false,
+          "tool_call_summary_format": "{result}",
+          "metadata": {}
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "Redator Técnico",
+        "label": "Redator Técnico",
+        "config": {
+          "name": "redatorTecnico",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "Chat completion client for Gemini hosted models.",
+            "label": "GeminiChatCompletionClient",
+            "config": {
+              "model": "gemini-2.0-flash",
+              "api_key": "AIzaSyCkiOWWbqawf11sFU8XKot0SEapLj2HoSs"
+            }
+          },
+          "workbench": {
+            "provider": "autogen_core.tools.StaticWorkbench",
+            "component_type": "workbench",
+            "version": 1,
+            "component_version": 1,
+            "description": "A workbench that provides a static set of tools that do not change after\n    each tool execution.",
+            "label": "StaticWorkbench",
+            "config": {
+              "tools": [
+                {
+                  "provider": "autogen_core.tools.FunctionTool",
+                  "component_type": "tool",
+                  "version": 1,
+                  "component_version": 1,
+                  "description": "Create custom tools by wrapping standard Python functions.",
+                  "label": "FunctionTool",
+                  "config": {
+                    "source_code": "def calculator(a: float, b: float, operator: str) -> str:\n    try:\n        if operator == \"+\":\n            return str(a + b)\n        elif operator == \"-\":\n            return str(a - b)\n        elif operator == \"*\":\n            return str(a * b)\n        elif operator == \"/\":\n            if b == 0:\n                return \"Error: Division by zero\"\n            return str(a / b)\n        else:\n            return \"Error: Invalid operator. Please use +, -, *, or /\"\n    except Exception as e:\n        return f\"Error: {str(e)}\"\n",
+                    "name": "calculator",
+                    "description": "A simple calculator that performs basic arithmetic operations",
+                    "global_imports": [],
+                    "has_cancellation_support": false
+                  }
+                }
+              ]
+            }
+          },
+          "model_context": {
+            "provider": "autogen_core.model_context.UnboundedChatCompletionContext",
+            "component_type": "chat_completion_context",
+            "version": 1,
+            "component_version": 1,
+            "description": "An unbounded chat completion context that keeps a view of the all the messages.",
+            "label": "UnboundedChatCompletionContext",
+            "config": {}
+          },
+          "description": "An agent that provides assistance with ability to use tools.",
+          "system_message": "[IDENTIDADE E MISSÃO]\nVocê é o Redator Técnico do projeto \"DevFlow AI\". Sua missão exclusiva é compilar e formatar o documento técnico final do sistema, que será a entrega para o cliente (Accenture).\n[CONTEXTO DA EQUIPE]\nVocê integra uma equipe de 9 agentes de IA que simulam o planejamento de um software. Você deve interagir profissionalmente e solicitar informações dos seguintes 8 colegas:\nLíder Técnico (Orquestrador)\nAnalista de Requisitos\nArquiteto de Software\nDesigner de Interface\nDesenvolvedor de Lógica de Negócio\nDesenvolvedor de Interface\nEngenheiro de Testes\nGerente de Projeto\n[OBJETIVO PRINCIPAL]\nSeu objetivo é transformar o log das conversas e as decisões da equipe em um relatório técnico impecável. Você é o guardião da clareza, consistência e profissionalismo do documento final. Você não participa das discussões de brainstorming; você consolida as decisões tomadas.\n[REGRAS E COMPORTAMENTO (PERSONALIDADE EFICIENTE)]\nValores Fundamentais: Clareza, Objetividade, Consistência.\nLinguagem e Estilo: Use linguagem profissional, clara e direta. Seja formal, mas acessível. Sua comunicação é assertiva e focada na tarefa.\nFalar TERMINATE no final da mensagem\n[O QUE VOCÊ FAZ (Ações Permitidas)]\nCompilar: Reunir todas as informações dos outros agentes.\nEstruturar: Propor e criar a estrutura do documento (Sumário, seções, subseções).\nFormatar: Garantir que o documento final seja limpo e organizado.\nSolicitar Esclarecimentos: Se uma informação estiver faltando ou for ambígua, você DEVE solicitar ativamente ao agente responsável.\nExemplo: \"@Analista de Requisitos, a Seção 2.4 (Requisitos Não Funcionais) está incompleta. Por favor, forneça a lista final para eu poder documentar.\"\nExemplo: \"@Arquiteto de Software, a decisão sobre o banco de dados está ambígua. Por favor, confirme a tecnologia escolhida para o relatório.\"\n[O QUE VOCÊ NÃO FAZ (Limitações Estritas)]\nVocê NÃO dá opinião pessoal ou subjetiva sobre o projeto (Ex: \"Acho que essa arquitetura é muito complexa\" ou \"Gostei mais da cor azul para o design\").\nVocê NÃO cria, inventa ou infere informações que não foram explicitamente declaradas pelos outros agentes. Se o @Analista de Requisitos listou 5 requisitos, você documenta 5. Você não \"completa\" o sexto por conta própria.\nVocê NÃO toma decisões de projeto. (Ex: \"Ok, vamos seguir com essa arquitetura\" ou \"Requisito aprovado\"). Sua função é documentar a decisão depois que o @Líder Técnico ou o agente responsável a toma.\nVocê NÃO debate tecnologia, design ou prazos. Se o @Desenvolvedor de Lógica de Negócio e o @Arquiteto de Software estiverem discutindo, você espera a conclusão.\nVocê NÃO interpreta ambiguidades. Se dois agentes fornecerem informações conflitantes, você não escolhe um lado. Você deve sinalizar a inconsistência. (Ex: \"@Líder Técnico, notei um conflito: o @Arquiteto definiu o banco de dados como A, mas o @Desenvolvedor de Lógica mencionou o banco B. Qual informação deve constar no relatório final?\").\nVocê NÃO assume o papel de Gerente de Projeto. Você não cobra prazos ou gerencia o fluxo de trabalho (Ex: \"Vamos, @Designer, preciso das telas\"). Você apenas solicita a informação que falta para o seu documento.",
           "model_client_stream": false,
           "reflect_on_tool_use": false,
           "tool_call_summary_format": "{result}",
@@ -82,17 +537,6 @@
       "config": {
         "conditions": [
           {
-            "provider": "autogen_agentchat.conditions.TextMentionTermination",
-            "component_type": "termination",
-            "version": 1,
-            "component_version": 1,
-            "description": "Terminate the conversation if a specific text is mentioned.",
-            "label": "TextMentionTermination",
-            "config": {
-              "text": "TERMINATE"
-            }
-          },
-          {
             "provider": "autogen_agentchat.conditions.MaxMessageTermination",
             "component_type": "termination",
             "version": 1,
@@ -100,8 +544,19 @@
             "description": "Terminate the conversation after a maximum number of messages have been exchanged.",
             "label": "MaxMessageTermination",
             "config": {
-              "max_messages": 10,
+              "max_messages": 100,
               "include_agent_event": false
+            }
+          },
+          {
+            "provider": "autogen_agentchat.conditions.TextMentionTermination",
+            "component_type": "termination",
+            "version": 1,
+            "component_version": 1,
+            "description": "Text Mention termination condition",
+            "label": "Text Mention",
+            "config": {
+              "text": "TERMINATE"
             }
           }
         ]
