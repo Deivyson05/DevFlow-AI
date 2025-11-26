@@ -39,3 +39,8 @@ Sistema de Apoio Inteligente ao Desenvolvimento de Software
 - [Relatório Geral](https://docs.google.com/document/d/1sXZsXGc2X3WSliC-4kxq8DHaEDJchnoB3eZEWt_DnnU/edit?usp=sharing)
 - [Engenharia de prompt](https://www.youtube.com/watch?v=1VDcke66TRE&t=2026s)
 - [Documentação do Autogen Studio](https://microsoft.github.io/autogen/dev//user-guide/autogenstudio-user-guide/index.html)
+
+### Prompt de entrada
+```
+Crie um site de apresentação para uma transportadora fictícia, onde irá apresentar as sessões home, sobre, serviços e contato.
+```
